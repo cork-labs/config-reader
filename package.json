@@ -1,6 +1,6 @@
 {
   "name": "@cork-labs/config-reader",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node.js class, reads, merges, parsers and freezes multi-file config data",
   "license": "MIT",
   "homepage": "https://github.com/cork-labs/config-reader",
