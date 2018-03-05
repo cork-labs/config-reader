@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "_mocha --recursive test/ --watch",
     "lint": "eslint --fix src/ test/",
-    "test": "istanbul cover _mocha --recursive test/",
+    "test": "istanbul cover _mocha -- --recursive test/",
     "build": "eslint src/ test/ && npm run test",
     "coverage": "http-server coverage/lcov-report/"
   },
