@@ -9,6 +9,7 @@ const deepFreeze = require('deep-freeze');
 
 class Config {
   constructor () {
+    this._files = [];
     this._frozen = null;
     this._data = { };
     this._$vars = {};
@@ -48,20 +49,31 @@ class Config {
     console.log('Config::readDir() scan', dirName);
     var files = fs.readdirSync(dirName);
     files.forEach((file) => {
-      var configFile = path.resolve(path.join(dirName, file));
-      if (this._files.indexOf(configFile) !== -1) {
-        throw new Error(`ConfigReader::_readDir() File  "${configFile}" was already read.`);
+      var fileName = path.resolve(path.join(dirName, file));
+      if (this._files.indexOf(fileName) !== -1) {
+        throw new Error(`ConfigReader::_readDir() File  "${fileName}" was already read.`);
       }
-      var stats = fs.statSync(configFile);
+      this._files.push(fileName);
+      var stats = fs.statSync(fileName);
       if (stats) {
         if (stats.isFile() && file.match(/\.json$/)) {
-          this._mergeConfig(data, this._readFile(configFile));
+          this._mergeConfig(data, this._readFile(fileName));
         } else if (stats.isDirectory()) {
-          this._readDir(configFile);
+          this._readDir(fileName);
         }
       }
     });
     return data;
+  }
+
+  _parseValue (value, matches, $vars) {
+    return matches.reduce((value, match) => {
+      const varName = match.substring(2, match.length - 2);
+      if (!(varName in $vars)) {
+        throw new Error(`ConfigReader::_parseVars() $var "${varName}" is not defined`);
+      }
+      return value.replace(match, $vars[varName]);
+    }, value);
   }
 
   _parseVars (data, $vars) {
@@ -71,13 +83,9 @@ class Config {
       if (typeof data[key] === 'object') {
         this._parseVars(data[key], $vars);
       } else if (typeof data[key] === 'string') {
-        matches = data[key].match(/^<%([a-zA-Z0-9.-]+)%>$/);
+        matches = data[key].match(/<%([a-zA-Z0-9.-]+)%>/g);
         if (matches) {
-          if (!(matches[1] in $vars)) {
-            throw new Error(`ConfigReader::_parseVars() $var "${matches[1]}" is not defined`);
-          } else {
-            data[key] = $vars[matches[1]];
-          }
+          data[key] = this._parseValue(data[key], matches, $vars);
         }
       }
     }
