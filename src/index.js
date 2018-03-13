@@ -45,16 +45,16 @@ class Config {
   }
 
   _readDir (dirName) {
-    var data = {};
+    const data = {};
     console.log('Config::readDir() scan', dirName);
-    var files = fs.readdirSync(dirName);
+    const files = fs.readdirSync(dirName);
     files.forEach((file) => {
-      var fileName = path.resolve(path.join(dirName, file));
+      const fileName = path.resolve(path.join(dirName, file));
       if (this._files.indexOf(fileName) !== -1) {
         throw new Error(`ConfigReader::_readDir() File  "${fileName}" was already read.`);
       }
       this._files.push(fileName);
-      var stats = fs.statSync(fileName);
+      const stats = fs.statSync(fileName);
       if (stats) {
         if (stats.isFile() && file.match(/\.json$/)) {
           this._mergeConfig(data, this._readFile(fileName));
