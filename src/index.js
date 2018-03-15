@@ -68,7 +68,7 @@ class Config {
 
   _parseValue (value, matches, $vars) {
     return matches.reduce((value, match) => {
-      const varName = match.substring(2, match.length - 2);
+      const varName = match.substring(2, match.length - 2).trim();
       if (!(varName in $vars)) {
         throw new Error(`ConfigReader::_parseVars() $var "${varName}" is not defined`);
       }
@@ -83,7 +83,7 @@ class Config {
       if (typeof data[key] === 'object') {
         this._parseVars(data[key], $vars);
       } else if (typeof data[key] === 'string') {
-        matches = data[key].match(/<%([a-zA-Z0-9.-]+)%>/g);
+        matches = data[key].match(/<%\s*([a-zA-Z0-9.-]+)\s*%>/g);
         if (matches) {
           data[key] = this._parseValue(data[key], matches, $vars);
         }
