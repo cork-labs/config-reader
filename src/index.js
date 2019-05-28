@@ -46,7 +46,6 @@ class Config {
 
   _readDir (dirName) {
     const data = {};
-    console.log('Config::readDir() scan', dirName);
     const files = fs.readdirSync(dirName);
     files.forEach((file) => {
       const fileName = path.resolve(path.join(dirName, file));
@@ -70,7 +69,7 @@ class Config {
     return matches.reduce((value, match) => {
       const varName = match.substring(2, match.length - 2).trim();
       if (!(varName in $vars)) {
-        throw new Error(`ConfigReader::_parseVars() $var "${varName}" is not defined`);
+        throw new Error(`config-reader.() $var "${varName}" is not defined`);
       }
       return value.replace(match, $vars[varName]);
     }, value);
